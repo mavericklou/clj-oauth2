@@ -1,9 +1,7 @@
 (ns clj-oauth2.client
   (:refer-clojure :exclude [get])
-  (:use [clj-http.client :only [wrap-request]])
-  (:require [clj-http.client :as http]
+  (:require [clj-http.client :as http :refer [wrap-request]]
             [clojure.string :as str]
-            [cheshire.core :as json]
             [uri.core :as uri])
   (:import [clj_oauth2 OAuth2Exception OAuth2StateMismatchException]
            [org.apache.commons.codec.binary Base64]))
@@ -64,14 +62,14 @@
         {:client_id client-id
          :client_secret client-secret}}))))
 
-(defn read-json-from-body
-  "convert body to a reader to be compatible with clojure.data.json 0.2.1
-   In case body is a byte array, aka class [B"
-  [body]
-  (if (instance? String body)
-    (json/parse-string body true)
-    (with-open [reader (clojure.java.io/reader body)]
-      (json/parse-stream reader true))))
+;; (defn read-json-from-body
+;;   "convert body to a reader to be compatible with clojure.data.json 0.2.1
+;;    In case body is a byte array, aka class [B"
+;;   [body]
+;;   (if (instance? String body)
+;;     (json/parse-string body true)
+;;     (with-open [reader (clojure.java.io/reader body)]
+;;       (json/parse-stream reader true))))
 
 (defn- request-access-token
   [endpoint params]
@@ -88,7 +86,7 @@
         body (if (and content-type
                       (or (.startsWith content-type "application/json")
                           (.startsWith content-type "text/javascript"))) ; Facebookism
-               (read-json-from-body body true)
+               body
                (uri/form-url-decode body)) ; Facebookism
         error (:error body)]
     (if (or error (not= status 200))
@@ -170,6 +168,16 @@
           (throw (OAuth2Exception. "Missing :oauth2 params"))
           (client req))))))
 
+;; (defn refresh-access-token
+;;   [refresh-token {:keys [client-id client-secret access-token-uri]}]
+;;   (let [req (http/post access-token-uri {:form-params
+;;                                          {:client_id client-id
+;;                                           :client_secret client-secret
+;;                                           :refresh_token refresh-token
+;;                                           :grant_type "refresh_token"}})]
+;;     (when (= (:status req) 200)
+;;       (read-json-from-body (:body req) true))))
+
 (defn refresh-access-token
   [refresh-token {:keys [client-id client-secret access-token-uri]}]
   (let [req (http/post access-token-uri {:form-params
@@ -178,17 +186,25 @@
                                           :refresh_token refresh-token
                                           :grant_type "refresh_token"}})]
     (when (= (:status req) 200)
-      (read-json-from-body (:body req) true))))
+      (:body req))))
 
 (def request
   (wrap-oauth2 http/request))
+
+;; (defmacro def-request-shortcut-fn [method]
+;;   (let [method-key (keyword method)]
+;;     `(defn ~method [url# & [req#]]
+;;        (request (merge req#
+;;                        {:method ~method-key
+;;                         :url url#})))))
 
 (defmacro def-request-shortcut-fn [method]
   (let [method-key (keyword method)]
     `(defn ~method [url# & [req#]]
        (request (merge req#
                        {:method ~method-key
-                        :url url#})))))
+                        :url url#
+                        :as :json})))))
 
 (def-request-shortcut-fn get)
 (def-request-shortcut-fn post)
