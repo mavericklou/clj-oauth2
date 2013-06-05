@@ -1,10 +1,16 @@
-(defproject net.likestream/clj-oauth2 "0.1.1"
-  :description "clj-http and ring middlewares for OAuth 2.0"
-  :dependencies [[org.clojure/clojure "1.2.1"]
-                 [org.clojure/data.json "0.1.2"] ;; bumped from 0.1.1
-                 [clj-http "0.3.2"] ;; bumped form 0.2.6
-                 ]
-  :dev-dependencies [[ring "0.3.11"]
-                     [com.stuartsierra/lazytest "1.1.2"]]
+(def dev-dependencies
+  '[[ring "1.2.0-beta3"]])
+
+(defproject net.likestream/clj-oauth2 "0.5.3"
+  :description "clj-http and ring middleware for OAuth 2.0"
+  :dependencies [[org.clojure/clojure "1.5.1"]
+                 [clj-http "0.7.2"]
+                 [uri "1.1.0"]
+                 [commons-codec/commons-codec "1.7"]]
+  :exclusions   [org.clojure/clojure-contrib]
+  :dev-dependencies ~dev-dependencies
+  :profiles {:dev {:dependencies ~dev-dependencies}}
   :repositories {"stuartsierra-releases" "http://stuartsierra.com/maven2"}
-  :aot [clj-oauth2.OAuth2Exception clj-oauth2.OAuth2StateMismatchException])
+  :aot [clj-oauth2.OAuth2Exception
+        clj-oauth2.OAuth2StateMismatchException])
+
