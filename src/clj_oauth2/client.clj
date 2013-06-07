@@ -88,7 +88,7 @@
         body (if (and content-type
                       (or (.startsWith content-type "application/json")
                           (.startsWith content-type "text/javascript"))) ; Facebookism
-               (read-json-from-body body true)
+               (read-json-from-body body)
                (uri/form-url-decode body)) ; Facebookism
         error (:error body)]
     (if (or error (not= status 200))
