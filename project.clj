@@ -1,7 +1,7 @@
 (def dev-dependencies
   '[[ring "1.1.5"]])
 
-(defproject mavericklou/clj-oauth2 "0.5.2"
+(defproject sudharsh/clj-oauth2 "0.5.3"
   :description "clj-http and ring middlewares for OAuth 2.0"
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [cheshire "5.0.2"]
@@ -12,5 +12,6 @@
   :dev-dependencies ~dev-dependencies
   :profiles {:dev {:dependencies ~dev-dependencies}}
   :repositories {"stuartsierra-releases" "http://stuartsierra.com/maven2"}
+  :url "http://github.com/sudharsh/clj-oauth2"
   :aot [clj-oauth2.OAuth2Exception
         clj-oauth2.OAuth2StateMismatchException])
