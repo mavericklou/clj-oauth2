@@ -88,7 +88,7 @@
         body (if (and content-type
                       (or (.startsWith content-type "application/json")
                           (.startsWith content-type "text/javascript"))) ; Facebookism
-               (read-json-from-body body true)
+               (read-json-from-body body)
                (uri/form-url-decode body)) ; Facebookism
         error (:error body)]
     (if (or error (not= status 200))
@@ -178,7 +178,7 @@
                                           :refresh_token refresh-token
                                           :grant_type "refresh_token"}})]
     (when (= (:status req) 200)
-      (read-json-from-body (:body req) true))))
+      (read-json-from-body (:body req)))))
 
 (def request
   (wrap-oauth2 http/request))
